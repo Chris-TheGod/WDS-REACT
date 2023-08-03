@@ -1,24 +1,34 @@
-import { useState } from 'react'
+//https://jsonplaceholder.typicode.com/users
+
+import { useEffect, useState } from 'react'
 
 function App() {
-  const [name, setName] = useState('')
-  const [age, setAge] = useState(0)
+  const [users, setUsers] = useState()
+  const [loading, setLoading] = useState(true)
 
-  const handleMinusClick = () => setAge(age - 1)
-  const handlePlusClick = () => setAge(age + 1)
+  useEffect(() => {
+    setLoading(true)
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
+  let jsx
+  if (loading) {
+    jsx = <h2>Loading...</h2>
+  } else {
+    jsx = JSON.stringify(users)
+  }
   return (
-    <>
-      <input onChange={(e) => setName(e.target.value)} />
-      <br />
-      <button onClick={handleMinusClick}>-</button>
-      The age is: {age}
-      <button onClick={handlePlusClick}>+</button>
-      <br />
-      <div>
-        The name is: {name} and the age is: {age}
-      </div>
-    </>
+    <div>
+      <h1>Users</h1>
+      {jsx}
+    </div>
   )
 }
 
