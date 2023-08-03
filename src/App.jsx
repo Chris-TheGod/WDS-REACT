@@ -1,34 +1,41 @@
 //https://jsonplaceholder.typicode.com/users
 
 import { useEffect, useState } from 'react'
+import { User } from './User'
 
 function App() {
-  const [users, setUsers] = useState()
-  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
-    fetch('https://jsonplaceholder.typicode.com/users')
+    setIsLoading(true)
+    const controller = new AbortController()
+    fetch('https://jsonplaceholder.typicode.com/users', {
+      signal: controller.signal,
+    })
       .then((res) => res.json())
-      .then((data) => {
-        setUsers(data)
-      })
+      .then(setUsers)
       .finally(() => {
-        setLoading(false)
+        setIsLoading(false)
       })
+
+    return () => controller.abort
   }, [])
 
-  let jsx
-  if (loading) {
-    jsx = <h2>Loading...</h2>
-  } else {
-    jsx = JSON.stringify(users)
-  }
   return (
-    <div>
-      <h1>Users</h1>
-      {jsx}
-    </div>
+    <>
+      <h1>User List</h1>
+      {isLoading ? (
+        <h2>Loading...</h2>
+      ) : (
+        <ul>
+          {users != null &&
+            users.map((user) => {
+              return <User key={user.id} name={user.name} />
+            })}
+        </ul>
+      )}
+    </>
   )
 }
 
