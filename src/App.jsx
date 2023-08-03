@@ -4,6 +4,7 @@ const INITIAL_VALUE = ['A', 'B', 'C']
 
 function App() {
   const [array, setArray] = useState(INITIAL_VALUE)
+  const [value, setValue] = useState('')
 
   function removeFirstElement() {
     setArray((currentArray) => {
@@ -37,6 +38,21 @@ function App() {
     setArray(INITIAL_VALUE)
   }
 
+  function updateAToH() {
+    setArray((currentArray) => {
+      return currentArray.map((element) => {
+        if (element === 'A') return 'H'
+        return element
+      })
+    })
+  }
+
+  function addLetterAtIndex(letter, index) {
+    setArray((currentArray) => {
+      return [currentArray.slice(0, index), letter, currentArray.slice(index)]
+    })
+  }
+
   return (
     <div>
       <button onClick={removeFirstElement}>Remove first element</button>
@@ -51,6 +67,16 @@ function App() {
       <br />
       <button onClick={reset}>Reset</button>
       <br />
+      <button onClick={updateAToH}>Uptade A to H</button>
+      <br />
+      <button onClick={() => addLetterAtIndex('C', 2)}>Add C at 2</button>
+      <br />
+      <input onChange={(e) => setValue(e.target.value)} value={value} />
+      <br />
+      <button onClick={() => addLetterToStart(value)}>
+        Add Value To Array
+      </button>
+
       <br />
       {array.join(', ')}
     </div>
