@@ -1,40 +1,63 @@
-//https://jsonplaceholder.typicode.com/users
-
-import { useEffect, useState } from 'react'
-import { User } from './User'
+import { useState } from 'react'
+import { TodoItem } from './TodoItem'
+import './styles.css'
 
 function App() {
-  const [users, setUsers] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [newTodoName, setNewTodoName] = useState('')
+  const [todos, setTodos] = useState([])
 
-  useEffect(() => {
-    setIsLoading(true)
-    const controller = new AbortController()
-    fetch('https://jsonplaceholder.typicode.com/users', {
-      signal: controller.signal,
+  function addNewTodo() {
+    if (newTodoName === '') return
+
+    setTodos((currentTodos) => {
+      return [
+        ...currentTodos,
+        { name: newTodoName, completed: false, id: crypto.randomUUID() },
+      ]
     })
-      .then((res) => res.json())
-      .then(setUsers)
-      .finally(() => {
-        setIsLoading(false)
-      })
+    setNewTodoName('')
+  }
 
-    return () => controller.abort
-  }, [])
+  function toggleTodo(todoId, completed) {
+    setTodos((currentTodos) => {
+      return currentTodos.map((todo) => {
+        if (todo.id === todoId) return { ...todo, completed }
+
+        return todo
+      })
+    })
+  }
+
+  function deleteTodo(todoId) {
+    setTodos((currentTodos) => {
+      return currentTodos.filter((todo) => todo.id !== todoId)
+    })
+  }
 
   return (
     <>
-      <h1>User List</h1>
-      {isLoading ? (
-        <h2>Loading...</h2>
-      ) : (
-        <ul>
-          {users != null &&
-            users.map((user) => {
-              return <User key={user.id} name={user.name} />
-            })}
-        </ul>
-      )}
+      <ul id='list'>
+        {todos.map((todo) => {
+          return (
+            <TodoItem
+              key={todo.id}
+              {...todo}
+              toggleTodo={toggleTodo}
+              deleteTodo={deleteTodo}
+            />
+          )
+        })}
+      </ul>
+      <div id='new-todo-form'>
+        <label className='todo-input'>New Todo</label>
+        <input
+          type='text'
+          id='todo-input'
+          value={newTodoName}
+          onChange={(e) => setNewTodoName(e.target.value)}
+        />
+        <button onClick={addNewTodo}>Add Todo</button>
+      </div>
     </>
   )
 }
